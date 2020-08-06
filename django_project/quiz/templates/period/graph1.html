@@ -1,0 +1,53 @@
+{%extends 'period/search.html'%}
+{%load static%}
+{%block content%}
+    <div>
+        <img src = "{%static '/images/graph/foo.png'%}" alt="엥?" align="top">
+    </div>
+    <script>
+        content_from_django = '{{contents}}'
+        const contents_string = '{{contents}}'.replace(/#x27;/gi, "").replace(/amp;/gi, "").replace(/&/gi, "\"");
+        const contents = JSON.parse(contents_string);
+        F = document.createElement('form');
+        F.action = "{%url 'result'%}";
+        F.method = 'GET';
+        S = document.createElement('select');
+        S.id = 'period';
+        S.name = 'period';
+        var opt0 = document.createElement('option');
+        opt0.value = "";
+        opt0.text = "시간 선택";
+        S.add(opt0, null);
+        for(key in contents){
+            var opt = document.createElement('option');
+            opt.value = key;
+            opt.text = contents[key];
+            S.add(opt, null);
+        }
+        S.style="float:left;margin-right:3px;";
+        H = document.createElement('input');
+        H.type = 'hidden';
+        H.name = 'category';
+        H.value = '{{category}}'
+        H2 = document.createElement('input');
+        H2.type = 'hidden';
+        H2.name = 'contents';
+        H2.value = content_from_django;
+        F.appendChild(S);
+        F.appendChild(H);
+        F.appendChild(H2);
+        document.body.appendChild(F);
+        function FormSubmit(){
+            if(!S.value){
+                alert("시간을 선택해주세요");
+            } else{
+                F.submit();
+            }
+        }
+    </script>
+    <input type="button" value="검색" style="float:left;" onclick="FormSubmit()">
+    <br>
+    <br>
+    {%block image%}
+    {%endblock%}
+{%endblock%}

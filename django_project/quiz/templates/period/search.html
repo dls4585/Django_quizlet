@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+{%load static%}
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <script>
+           function submitForm(){
+                var Form = document.getElementById('setting');
+                Form.action ="{%url 'search'%}";
+                var category = document.getElementById('category').value;
+                var from_time = document.getElementById('from').value;
+                var to_time = document.getElementById('to').value;
+                if (!category || !from_time || !to_time){
+                    alert("모두 입력해주세요");
+                } else {
+                    Form.submit();
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <form id="setting" name="setting" method="get">
+             <div class="category" style="float:left;width:15%;">
+                <label for="category">선택: </label>
+                <select id="category" name="category">
+                    <option value="" selected>카테고리</option>
+                    <option value="keywords">검색</option>
+                    <option value="downloads">다운로드</option>
+                    <option value="make">제작시간</option>
+                </select>
+            </div>
+            <div class="from-time" style="float:left;width:20%;">
+                <label for="from-time">From: </label>
+                <input type="text" id="from" name="from" placeholder="YYYY-MM-DD" style="width:50%;"/>
+            </div>
+            <div class="to-time" style="float:left;width:20%;">
+                <label for="to-time">To: </label>
+                <input type="text" id="to" name="to" placeholder="YYYY-MM-DD" style="width:50%;"/>
+            </div>
+            <input type="button" value="검색" style="float:left;width:5%;" onclick="submitForm()">
+        </form>
+        <br>
+        <br>
+        <hr>
+        {%block content%}
+        {%endblock%}
+    </body>
+</html>
