@@ -1,0 +1,13 @@
+{%extends 'base.html'%}
+{%block html%}
+<form method="get" action="http://127.0.0.1:8000/cards/results">
+<input type="text" name="keyword" placeholder="Card 검색">
+​​​​​​​ <button type="submit">SEARCH</button>
+</form> <br>
+<ul>
+{{ card.title }} <br>
+    {% for quiz in card.quiz_set.all %}
+    <li> 퀴즈 - {{ quiz.question }} /  답 - {{ quiz.answer }}</li>
+    {% endfor %}
+</ul>
+{%endblock html%}

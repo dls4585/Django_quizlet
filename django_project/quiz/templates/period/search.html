@@ -1,5 +1,7 @@
 <!DOCTYPE html>
+{%extends 'base.html'%}
 {%load static%}
+{%block html%}
 <html>
     <head>
         <meta charset="UTF-8">
@@ -20,6 +22,8 @@
     </head>
     <body>
         <form id="setting" name="setting" method="get">
+             <fieldset style = "width:890">
+                <legend>입력</legend>
              <div class="category" style="float:left;width:15%;">
                 <label for="category">선택: </label>
                 <select id="category" name="category">
@@ -38,11 +42,10 @@
                 <input type="text" id="to" name="to" placeholder="YYYY-MM-DD" style="width:50%;"/>
             </div>
             <input type="button" value="검색" style="float:left;width:5%;" onclick="submitForm()">
+        </fieldset>
         </form>
-        <br>
-        <br>
-        <hr>
         {%block content%}
-        {%endblock%}
+        {%endblock content%}
     </body>
 </html>
+{%endblock html%}
