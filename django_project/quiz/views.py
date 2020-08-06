@@ -1,5 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from scipy.sparse.data import _data_matrix
+
 from .models import Quiz, Card, login, search_time, download_time, make_time
 from json import dumps
 from django.utils import timezone
@@ -147,11 +149,11 @@ def find_similar(card_name, sentence, skip_gram=True):
 # ------------------------------------------------------------------------------------------
 # url
 
-def show(request):
+def basic_search_view(request):
     return render(request, 'period/search.html')
 
 
-def period_search(request):
+def graph_for_category_view(request):
 
     if request.method == 'GET':
         from_time = request.GET.get('from')
@@ -168,32 +170,32 @@ def period_search(request):
         elif request.GET.get('category') == 'make':
             data_sr, timelist = make_chart_data(make_time, from_time, to_time)
         category = request.GET.get('category')
-        contents = {}
+        time_options = {}
         for date in timelist:
             date = date.replace("\n", "", 5)
-            contents[date] = date
+            time_options[date] = date
 
         make_chart(data_sr)
-        return render(request, 'period/graph1.html', {'contents': contents, 'category': category})
+        return render(request, 'period/graph1.html', {'time_options': time_options, 'category': category})
 
 
 def make_chart_data(category, from_time, to_time):
-    data = []
     seg_time = from_time + datetime.timedelta(hours=3)
-    dates = []
-    counts = []
+    timelist = []
+    index_dates = []
+    column_counts = []
     while from_time < to_time:
-        key = x_axis(from_time, seg_time)
-        dates.append(from_time)
+        x_key = x_axis(from_time, seg_time)
+        index_dates.append(from_time)
         count = category.objects.filter(time__gte=from_time).exclude(time__gt=seg_time).count()
-        data.append(key)
-        counts.append(count)
+        timelist.append(x_key)
+        column_counts.append(count)
         from_time = from_time + datetime.timedelta(hours=3)
         seg_time = seg_time + datetime.timedelta(hours=3)
         if seg_time > to_time:
             seg_time = to_time
-    data_sr = pd.Series(counts, index=dates)
-    return data_sr, data
+    data_sr = pd.Series(column_counts, index=index_dates)
+    return data_sr, timelist
 
 
 def x_axis(from_time, seg_time):
@@ -204,7 +206,6 @@ def x_axis(from_time, seg_time):
 
 
 def make_chart(data_sr):
-
     plt.figure(figsize=(11, 7))
     plt.bar(data_sr.index, data_sr.values, width=0.1)
     plt.xlabel('Period')
@@ -219,38 +220,38 @@ def make_chart(data_sr):
 
 # ----------------------------------------------------
 
-def show_result(request):
+def graph_detail_view(request):
     category = request.GET.get('category')
-    get_data = request.GET.get('period').split(" ~ ")
-    contents = request.GET.get('contents')
-    from_time = datetime.datetime.strptime(get_data[0], "%Y-%m-%d %H:%M")
-    to_time = datetime.datetime.strptime(get_data[1], "%Y-%m-%d %H:%M") + datetime.timedelta(minutes=1)
+    data_from_html = request.GET.get('period').split(" ~ ")
+    time_options = request.GET.get('time_options')
+    from_time = datetime.datetime.strptime(data_from_html[0], "%Y-%m-%d %H:%M")
+    to_time = datetime.datetime.strptime(data_from_html[1], "%Y-%m-%d %H:%M") + datetime.timedelta(minutes=1)
     name_list = []
-    count = {}
+    counts = {}
     if request.GET.get('category') == 'keywords':
         data = search_time.objects.filter(time__gte=from_time).exclude(time__gt=to_time).values('keyword', 'time')
-        key = 'keyword'
+        field = 'keyword'
     elif request.GET.get('category') == 'downloads':
         data = download_time.objects.filter(time__gte=from_time).exclude(time__gt=to_time).values('card_name', 'time')
-        key = 'card_name'
+        field = 'card_name'
     elif request.GET.get('category') == 'make':
         data = make_time.objects.filter(time__gte=from_time).exclude(time__gt=to_time).values('card_name', 'time')
-        key = 'card_name'
-    add_list(data, key, name_list)
-    count_repetition(count, name_list)
-    name = []
-    number = []
-    sort = sorted(count.items(), key=lambda item: item[1], reverse=True)
-    for i in sort:
-        name.append(i[0])
-        number.append(i[1])
-    data_sr = pd.Series(number, index=name)
-    make_chart2(data_sr, key)
-    return render(request, 'period/graph2.html', {'contents': contents, 'category': category})
+        field = 'card_name'
+    add_list(data, field, name_list)
+    count_repetition(counts, name_list)
+    index_name = []
+    column_counts = []
+    sort_counts = sorted(counts.items(), key=lambda item: item[1], reverse=True)
+    for i in sort_counts:
+        index_name.append(i[0])
+        column_counts.append(i[1])
+    data_sr = pd.Series(column_counts, index=index_name)
+    make_detail_chart(data_sr, field)
+    return render(request, 'period/graph2.html', {'time_options': time_options, 'category': category})
 
-def add_list(data, key, name_list):
+def add_list(data, field, name_list):
     for i in data:
-        name_list.append(i[key])
+        name_list.append(i[field])
 
 
 def count_repetition(count, name_list):
@@ -260,14 +261,15 @@ def count_repetition(count, name_list):
         except: count[i] = 1
 
 # 그래프 세부 조정 하기
-def make_chart2(data_sr, key):
+def make_detail_chart(data_sr, field):
     font_path = "C:\\Windows\\Fonts\\gulim.ttc".replace("\\", "/", 10)
     font_name = fm.FontProperties(fname=font_path, size=100).get_name()
     plt.rc('font', family=font_name)
 
     plt.figure(figsize=(11, 7))
     plt.barh(data_sr.index, data_sr.values, height=0.1)
-    plt.xlabel(key)
+
+    plt.xlabel(field)
     plt.ylabel('amount')
     plt.xticks(fontsize=7)
     plt.tight_layout()
