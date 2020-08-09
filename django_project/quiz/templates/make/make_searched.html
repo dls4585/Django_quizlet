@@ -1,0 +1,13 @@
+{%extends 'make/make.html'%}
+{%block content%}
+    {%for date, values in counts.items%}
+        <div style="float:left; width:20%;border:1px solid;margin-right:10px;">
+            <center>{{date}}<br></center>
+        {%for key, value in values.items%}
+            <div style="float:left;margin-left:40px;">{{forloop.counter}}. {{key}}</div>
+            <div style="float:right;margin-right:50px;">{{value}}</div>
+            <br>
+        {%endfor%}
+        </div>
+    {%endfor%}
+{%endblock content%}

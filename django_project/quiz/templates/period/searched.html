@@ -1,0 +1,19 @@
+{%extends 'period/search.html'%}
+{%block content%}
+
+    {%for date, values in contents.items%}
+        <div style="float:left; width:20%;border:1px solid;margin-right:10px;">
+        <center>{{date}}<br></center>
+        {%for key, value in values.items%}
+            {% if forloop.counter < 11 %}
+            <div style="float:left;margin-left:40px;">{{forloop.counter}}.
+                <a href="http://127.0.0.1:8000/cards/results/?keyword={{key}}"> {{key}} </a>
+            </div>
+            <div style="float:right;margin-right:50px;">{{value}}</div>
+            <br>
+            {%endif%}
+        {%endfor%}
+        </div>
+    {%endfor%}
+
+{%endblock content%}

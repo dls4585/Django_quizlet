@@ -1,0 +1,14 @@
+{%extends 'download/download.html'%}
+{%block content%}
+    <div style="float:left; width:30%;border:1px solid;margin-right:10px;">
+        <center>오늘의 인기 다운로드 카드<br>({{today}})</center>
+        {%for key, values in lists.items%}
+            {%if forloop.counter < 11%}
+            {{forloop.counter}}.
+                <a href="http://127.0.0.1:8000/cards/results/retrieve/?pk={{values.pk}}">{{key}}</a>
+            <span style="float:right;margin-right:50px;">{{values.count}}</span>
+            <br>
+            {%endif%}
+        {%endfor%}
+    </div>
+{%endblock content%}

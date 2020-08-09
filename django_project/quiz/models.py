@@ -31,6 +31,7 @@ class Search_time(models.Model):
 class Download_time(models.Model):
     card_title = models.TextField(max_length=200, default=None, null=True)
     time = models.DateTimeField(auto_now_add=True, null=True)
+    card = models.ForeignKey(Card, on_delete=models.CASCADE)
 
 class Make_time(models.Model):
     card_title = models.TextField(max_length=200, default=None, null=True)

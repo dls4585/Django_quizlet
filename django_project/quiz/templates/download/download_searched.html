@@ -1,0 +1,16 @@
+{%extends 'download/download.html'%}
+{%block content%}
+    {%for date, values in lists.items%}
+        <div style="float:left; width:20%;border:1px solid;margin-right:10px;">
+        <center>{{date}}<br></center>
+        {%for key, value in values.items%}
+            {% if forloop.counter < 11 %}
+            {{forloop.counter}}.
+                <a href="http://127.0.0.1:8000/cards/results/retrieve/?pk={{value.pk}}">{{key}}</a>
+            <span style="float:right;margin-right:50px;">{{value.count}}</span>
+            <br>
+            {%endif%}
+        {%endfor%}
+        </div>
+    {%endfor%}
+{%endblock content%}

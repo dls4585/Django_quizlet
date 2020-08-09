@@ -4,6 +4,7 @@ from scipy.sparse.data import _data_matrix
 from .models import Quiz, Card, Login, Search_time, Download_time, Make_time
 from json import dumps
 from django.utils import timezone
+from .forms import *
 from nltk.tokenize import word_tokenize
 import nltk
 from konlpy.tag import Okt
@@ -79,8 +80,8 @@ def save_kw_time(strings):
 def login_check(name):
     Login(user_name=name, time=timezone.now()).save()
 
-def save_down(title):
-    Download_time(card_title=title, time=timezone.now()).save()
+def save_down(title, pk):
+    Download_time(card_title=title, time=timezone.now(), card=Card.objects.get_by_natural_key(pk)).save()
 
 def save_make(title):
     Make_time(card_title=title, time=timezone.now()).save()
@@ -159,8 +160,11 @@ def main(request):
     yesterday_login = Login.objects.filter(time__gte=yesterday).count() - today_login
 
     most_cards = Card.objects.order_by('-likes')[:5]
+    font_path = "C:\\Windows\\Fonts\\gulim.ttc".replace("\\", "/", 10)
+    font_name = fm.FontProperties(fname=font_path, size=100).get_name()
+    plt.rc('font', family=font_name)
 
-    plt.figure(figsize=(5, 5))
+    plt.figure(figsize=(6, 6))
     x = [-7, -6, -5, -4, -3, -2, -1]
     y = []
     for i in range(7):
@@ -171,7 +175,7 @@ def main(request):
         y.append(bd_cnt1 - bd_cnt2)
 
     plt.bar(x, y)
-    plt.xlabel('요일')
+    plt.xlabel('Day')
     plt.ylabel('방문자 수')
     base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                             'quiz/static')
@@ -372,136 +376,218 @@ def retrive_card(request):
     return render(request, 'quiz/card_retrieved.html', context)
 
 
-#---------------------------------------
+# ---------------------------------------
 
 def basic_search_view(request):
-    return render(request, 'period/search.html')
-
-
-def graph_for_category_view(request):
-
-    if request.method == 'GET':
-        from_time = request.GET.get('from')
-        from_time = datetime.datetime.strptime(from_time, '%Y-%m-%d')
-        to_time = request.GET.get('to')
-        to_time = datetime.datetime.strptime(to_time, '%Y-%m-%d')
-#        to_time 까지 결과에 포함하기 위해 하루 증가시킴
-        to_time = to_time + datetime.timedelta(days=1)
-
-        if request.GET.get('category') == 'keywords':
-            data_sr, timelist = make_chart_data(Search_time, from_time, to_time)
-        elif request.GET.get('category') == 'downloads':
-            data_sr, timelist = make_chart_data(Download_time, from_time, to_time)
-        elif request.GET.get('category') == 'make':
-            data_sr, timelist = make_chart_data(Make_time, from_time, to_time)
-        category = request.GET.get('category')
-        time_options = {}
-        for date in timelist:
-            date = date.replace("\n", "", 5)
-            time_options[date] = date
-
-        make_chart(data_sr)
-        return render(request, 'period/graph1.html', {'time_options': time_options, 'category': category})
-
-
-def make_chart_data(category, from_time, to_time):
-    seg_time = from_time + datetime.timedelta(hours=3)
-    timelist = []
-    index_dates = []
-    column_counts = []
-    while from_time < to_time:
-        x_key = x_axis(from_time, seg_time)
-        index_dates.append(from_time)
-        count = category.objects.filter(time__gte=from_time).exclude(time__gt=seg_time).count()
-        timelist.append(x_key)
-        column_counts.append(count)
-        from_time = from_time + datetime.timedelta(hours=3)
-        seg_time = seg_time + datetime.timedelta(hours=3)
-        if seg_time > to_time:
-            seg_time = to_time
-    data_sr = pd.Series(column_counts, index=index_dates)
-    return data_sr, timelist
-
-
-def x_axis(from_time, seg_time):
-    key = datetime.datetime.strftime(from_time, '%Y-%m-%d %H:%M')
-    key2 = datetime.datetime.strftime(seg_time, '%Y-%m-%d %H:%M')
-    key = key + '\n' + ' ~ ' + key2
-    return key
-
-
-def make_chart(data_sr):
-    plt.figure(figsize=(11, 6))
-    plt.bar(data_sr.index, data_sr.values, width=0.1)
-    plt.xlabel('Period')
-    plt.ylabel('Search')
-    plt.xticks(fontsize=7)
-    plt.tight_layout()
-    base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                            'quiz/static')
-    file_path = os.path.join(base_dir, 'images/graph/goo.png').replace("\\", "/", 30)
-
-    plt.savefig(file_path)
-
-# ----------------------------------------------------
-
-def graph_detail_view(request):
-    category = request.GET.get('category')
-    data_from_html = request.GET.get('period').split(" ~ ")
-    time_options = request.GET.get('time_options')
-    from_time = datetime.datetime.strptime(data_from_html[0], "%Y-%m-%d %H:%M")
-    to_time = datetime.datetime.strptime(data_from_html[1], "%Y-%m-%d %H:%M") + datetime.timedelta(minutes=1)
+    today = datetime.date.today()
+    form = SearchForm()
+    data = Search_time.objects.filter(time__contains=today).values('keyword')
     name_list = []
     counts = {}
-    if request.GET.get('category') == 'keywords':
-        data = Search_time.objects.filter(time__gte=from_time).exclude(time__gt=to_time).values('keyword', 'time')
-        field = 'keyword'
-    elif request.GET.get('category') == 'downloads':
-        data = Download_time.objects.filter(time__gte=from_time).exclude(time__gt=to_time).values('card_name', 'time')
-        field = 'card_name'
-    elif request.GET.get('category') == 'make':
-        data = Make_time.objects.filter(time__gte=from_time).exclude(time__gt=to_time).values('card_name', 'time')
-        field = 'card_name'
-    add_list(data, field, name_list)
-    count_repetition(counts, name_list)
-    index_name = []
-    column_counts = []
-    sort_counts = sorted(counts.items(), key=lambda item: item[1], reverse=True)
-    for i in sort_counts:
-        index_name.append(i[0])
-        column_counts.append(i[1])
-    data_sr = pd.Series(column_counts, index=index_name)
-    make_detail_chart(data_sr, field)
-    return render(request, 'period/graph2.html', {'time_options': time_options, 'category': category})
-
-def add_list(data, field, name_list):
     for i in data:
-        name_list.append(i[field])
+        name_list.append(i['keyword'])
+    count_repetition(counts, name_list)
+    counts = sorted(counts.items(), key=lambda item:item[1], reverse=True)
+    ranks = {}
+    for i in range(0,9):
+        if i >= len(counts):
+            break
+        ranks[counts[i][0]] = counts[i][1]
+
+    context = {
+        'form': form,
+        'ranks': ranks,
+        'today': datetime.date.strftime(today, "%Y-%m-%d"),
+    }
+    return render(request, 'period/search_default.html', context)
+
+
+def search_for_period(request):
+    form = SearchForm(request.GET)
+    from_time = request.GET.get('_from')
+    from_time = datetime.datetime.strptime(from_time, '%Y-%m-%d')
+    from_time = datetime.date(from_time.year, from_time.month, from_time.day)
+    to_time = request.GET.get('_to')
+    to_time = datetime.datetime.strptime(to_time, '%Y-%m-%d')
+    to_time = datetime.date(to_time.year, to_time.month, to_time.day)
+    to_time = to_time + datetime.timedelta(days=1)
+
+    contents = make_data(Search_time, from_time, to_time, 'keyword')
+
+    context = {
+        'form' : form,
+        'contents' : contents,
+    }
+
+    return render(request, 'period/searched.html', context)
+
+
+###############################
+
+
+def basic_download_view(request):
+    today = datetime.date.today()
+    form = SearchForm()
+    data = Download_time.objects.filter(time__contains=today).values('card_title', 'card')
+    contents = {}
+    name_list = []
+    for i in data:
+        content = {}
+        name_list.append(i['card_title'])
+        content['pk'] = i['card']
+        contents[i['card_title']] = content
+    count = {}
+    count_repetition(count, name_list)
+    for i in contents:
+        contents[i]['count'] = count[i]
+    contents = sorted(contents.items(), key=lambda item: item[1]['count'], reverse=True)
+    download_list = {}
+    for i in contents:
+        download_list[i[0]] = i[1]
+
+    context = {
+        'form': form,
+        'lists': download_list,
+        'today': datetime.date.strftime(today, "%Y-%m-%d"),
+    }
+    return render(request, 'download/download_default.html', context)
+
+
+def download_for_period(request):
+    form = SearchForm(request.GET)
+    from_time = request.GET.get('_from')
+    from_time = datetime.datetime.strptime(from_time, '%Y-%m-%d')
+    from_time = datetime.date(from_time.year, from_time.month, from_time.day)
+    to_time = request.GET.get('_to')
+    to_time = datetime.datetime.strptime(to_time, '%Y-%m-%d')
+    to_time = datetime.date(to_time.year, to_time.month, to_time.day)
+    to_time = to_time + datetime.timedelta(days=1)
+    list_for_days = {}
+    while from_time < to_time:
+        data = Download_time.objects.filter(time__contains=from_time).values('card_title', 'card')
+        contents = {}
+        name_list = []
+        for i in data:
+            content = {}
+            name_list.append(i['card_title'])
+            content['pk'] = i['card']
+            contents[i['card_title']] = content
+        count = {}
+        count_repetition(count, name_list)
+        for i in contents:
+            contents[i]['count'] = count[i]
+        contents = sorted(contents.items(), key=lambda item: item[1]['count'], reverse=True)
+        download_list = {}
+        for i in contents:
+            download_list[i[0]] = i[1]
+        list_for_days[datetime.date.strftime(from_time, '%Y-%m-%d')] = download_list
+
+    context = {
+        'form': form,
+        'lists': list_for_days,
+    }
+
+    return render(request, 'download/download_searched.html', context)
+
+
+def make_data(category, from_time, to_time, field):
+    data = {}
+    while from_time < to_time:
+        name_list = []
+        counts = {}
+        count_data = {}
+        _object = category.objects.filter(time__contains=from_time).values(field)
+        for i in _object:
+            name_list.append(i[field])
+        count_repetition(counts, name_list)
+        counts = sorted(counts.items(), key=lambda item: item[1], reverse=True)
+        for i in counts:
+            count_data[i[0]] = i[1]
+        data[datetime.date.strftime(from_time, '%Y-%m-%d')] = count_data
+        from_time += datetime.timedelta(days=1)
+    return data
+
+########################################
+
+
+def basic_make_view(request):
+    form = SearchForm()
+    today = datetime.date.today()
+    count_dict = {}
+    data = Make_time.objects.filter(time__contains=today).values('time')
+    for i in data:
+        key = datetime.datetime.strftime(i['time'], "%H") + ':00 ~ ' + \
+              datetime.datetime.strftime(i['time'] + datetime.timedelta(hours=1), "%H") + ':00'
+        try:
+            count_dict[key] += 1
+        except:
+            count_dict[key] = 1
+    for i in range(0, 24):
+        key = str(i) + ':00 ~ ' + str(i + 1) + ':00'
+        if (i + 1) == 24:
+            key = str(i) + ':00 ~ ' + '00:00'
+        try:
+            count_dict[key] += 0
+        except:
+            count_dict[key] = 0
+    count_tuple = sorted(count_dict.items(), key=lambda item: item[1], reverse=True)
+    count_for_hours = {}
+    for i in count_tuple:
+        count_for_hours[i[0]] = i[1]
+    context = {
+        'form': form,
+        'lists': count_for_hours,
+        'today': today,
+    }
+    return render(request, 'make/make_default.html', context)
+
+
+def make_for_period(request):
+    form = SearchForm(request.GET)
+    from_time = request.GET.get('_from')
+    from_time = datetime.datetime.strptime(from_time, '%Y-%m-%d')
+    from_time = datetime.date(from_time.year, from_time.month, from_time.day)
+    to_time = request.GET.get('_to')
+    to_time = datetime.datetime.strptime(to_time, '%Y-%m-%d')
+    to_time = datetime.date(to_time.year, to_time.month, to_time.day)
+    to_time = to_time + datetime.timedelta(days=1)
+
+    count_for_days = {}
+    while from_time < to_time:
+        count_dict = {}
+        data = Make_time.objects.filter(time__contains=from_time).values('time')
+        for i in data:
+            key = datetime.datetime.strftime(i['time'], "%H") + ':00 ~ ' + \
+                  datetime.datetime.strftime(i['time'] + datetime.timedelta(hours=1), "%H") + ':00'
+            try:
+                count_dict[key] += 1
+            except:
+                count_dict[key] = 1
+        for i in range(0, 24):
+            key = str(i) + ':00 ~ ' + str(i+1) + ':00'
+            if (i+1) == 24:
+                key = str(i) + ':00 ~ ' + '00:00'
+            try:
+                count_dict[key] += 0
+            except:
+                count_dict[key] = 0
+        count_tuple = sorted(count_dict.items(), key=lambda item: item[1], reverse=True)
+        count_for_hours = {}
+        for i in count_tuple:
+            count_for_hours[i[0]] = i[1]
+        key_for_days = datetime.date.strftime(from_time, "%Y-%m-%d")
+        count_for_days[key_for_days] = count_for_hours
+        from_time += datetime.timedelta(days=1)
+    context = {
+        'form': form,
+        'counts': count_for_days,
+    }
+
+    return render(request, 'make/make_searched.html', context)
 
 
 def count_repetition(count, name_list):
-    lists=[]
+    lists = []
     for i in name_list:
         try: count[i] += 1
         except: count[i] = 1
-
-# 그래프 세부 조정 하기
-def make_detail_chart(data_sr, field):
-    font_path = "C:\\Windows\\Fonts\\gulim.ttc".replace("\\", "/", 10)
-    font_name = fm.FontProperties(fname=font_path, size=100).get_name()
-    plt.rc('font', family=font_name)
-
-    plt.figure(figsize=(11, 6))
-    plt.barh(data_sr.index, data_sr.values, height=0.1)
-
-    plt.xlabel(field)
-    plt.ylabel('amount')
-    plt.xticks(fontsize=7)
-    plt.tight_layout()
-    base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                            'quiz/static')
-    file_path = os.path.join(base_dir, 'images/graph/poo.png').replace("\\", "/", 30)
-
-    plt.savefig(file_path)
-
-##개선사항 : 그래프 세부조정 / 두번째 그래프 띄우고 나서 폼 계속 띄우기 (search2 -> result html 전환 문제)

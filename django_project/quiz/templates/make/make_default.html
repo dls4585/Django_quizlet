@@ -1,0 +1,11 @@
+{%extends 'download/download.html'%}
+{%block content%}
+    <div style="float:left; width:30%;border:1px solid;margin-right:10px;">
+        <center>오늘 제작 시간 시간대별 추이<br>({{today}})</center>
+        {%for key, value in lists.items%}
+            <div style="float:left;margin-left:40px;">{{forloop.counter}}. {{key}}</div>
+            <div style="float:right;margin-right:50px;">{{value}}</div>
+            <br>
+        {%endfor%}
+    </div>
+{%endblock content%}
