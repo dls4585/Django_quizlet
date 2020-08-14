@@ -2,32 +2,44 @@
 {%load static%}
 {%block html%}
 <html>
-    <head></head>
-    <body>
-        <form action = "http://127.0.0.1:8000/visitors/results" accept-charset="utf-8" name = "graph-option" method = "get">
-            <fieldset style = "width:890">
-                <legend>입력</legend>
-                    <br>
-                    단위 선택
-                    <select name = "scale">
-                        <option value="none">=== 선택 ===</option>
-                        <optgroup label = "시간 단위">
-                            <option value = "time" >시간별</option>
-                        </optgroup>
-                         <optgroup label = "날짜 단위">
-                            <option value = "day">일간</option>
-                            <option value = "week">주간</option>
-                            <option value = "month">월간</option>
-                        </optgroup>
-                    </select> &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;
-		        from : <input placeholder="YYYY-MM-DD" type = "text" name = "from" required/> &nbsp; &nbsp; &nbsp; &nbsp;
-                to : <input placeholder="YYYY-MM-DD" type = "text" name = "to" required/> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                    &nbsp; &nbsp;<input type = "submit" value = "submit"/>
-            </fieldset>
-        </form><br>
-        {% block content %}
-            <img src = "{%static '/images/graph/foo.png'%}">
-        {% endblock %}
-    </body>
+    {%load static%}
+<head></head>
+<body>
+
+<script type="text/javascript">
+function innertHtmlSelect(val){
+    var html_hourly = "<br><form action = \"http://127.0.0.1:8000/visitors/hourly\" accept-charset=\"utf-8\" name = \"graph-option\" method = \"get\"> <input type = \'hidden\' name=\'scale\' value=\'hourly\'> 날짜 : <input type = \'date\' name=\'date\' value=\'\' required/> <input type = \"submit\" value = \"submit\"/> <br> <img src = \"{% static '/images/graph/foo.png' %}\"/>";
+	var html_daily = "<br><form action = \"http://127.0.0.1:8000/visitors/daily\" accept-charset=\"utf-8\" name = \"graph-option\" method = \"get\"> <input type = \'hidden\' name=\'scale\' value=\'daily\'/ > from : <input type = \'date\' name=\'from\' value=\'\' required/> &nbsp;&nbsp;to : <input type = \'date\' name=\'to\' value=\'\' required/> <input type = \"submit\" value = \"submit\"/> <br> <img src = \"{% static '/images/graph/foo.png' %}\"/>";
+	var html_weekly = "<br><form action = \"http://127.0.0.1:8000/visitors/weekly\" accept-charset=\"utf-8\" name = \"graph-option\" method = \"get\"> <input type = \'hidden\' name=\'scale\' value=\'weekly\'/> from : <input type = \'date\' name=\'from\' value=\'\' required/> &nbsp;&nbsp;to : <input type = \'date\' name=\'to\' value=\'\' required/> <input type = \"submit\" value = \"submit\"/> <br> <img src = \"{% static '/images/graph/foo.png' %}\"/>";
+    var html_monthly = "<br><form action = \"http://127.0.0.1:8000/visitors/monthly\" accept-charset=\"utf-8\" name = \"graph-option\" method = \"get\"> <input type = \'hidden\' name=\'scale\' value=\'monthly\'/ > from : <input placeholder = \"YYYY-MM\" type=\'text\' name=\'from\' value=\'\' required/> &nbsp;&nbsp; to : <input placeholder = \"YYYY-MM\" type=\'text\' name=\'to\' value=\'\' required/> <input type = \"submit\" value = \"submit\"/> <br> <img src = \"{% static '/images/graph/foo.png' %}\"/>";
+
+    if (val == "hourly"){
+        html = html_hourly;
+    }else if (val =="daily"){
+		html = html_daily;
+	} else if (val =="weekly"){
+		html = html_weekly;
+	} else if (val =="monthly"){
+		html = html_monthly;
+	}
+	document.getElementById('div_html').innerHTML = html;
+}
+</script>
+
+<select id="scale" name="scale" onChange="innertHtmlSelect(this.value);" >
+    <option value ="none"> ===선택=== </option>
+    <option value ="hourly"> 시간대별 </option>
+    <option value ="daily"> 일간 </option>
+    <option value ="weekly"> 주간 </option>
+    <option value ="monthly"> 월간 </option>
+</select>
+
+<div id="div_html">
+    {% block content %}
+        <img src = "{% static '/images/graph/foo.png' %}">
+    {% endblock %}
+</div>
+
+</body>
 </html>
 {%endblock html%}

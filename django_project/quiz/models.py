@@ -5,6 +5,7 @@ class Card(models.Model):
     cards = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=100, null=True)
     description = models.TextField(null=True)
+    hashtag = models.TextField(max_length=100, null=True)
     likes = models.IntegerField(default=0, null=True)
     downloads = models.IntegerField(default=0, null=True)
     number_of_quiz = models.IntegerField(default=0, null=True)

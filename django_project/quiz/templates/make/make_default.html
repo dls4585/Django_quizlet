@@ -1,11 +1,20 @@
-{%extends 'download/download.html'%}
+{%extends 'make/make.html'%}
 {%block content%}
-    <div style="float:left; width:30%;border:1px solid;margin-right:10px;">
-        <center>오늘 제작 시간 시간대별 추이<br>({{today}})</center>
-        {%for key, value in lists.items%}
-            <div style="float:left;margin-left:40px;">{{forloop.counter}}. {{key}}</div>
-            <div style="float:right;margin-right:50px;">{{value}}</div>
-            <br>
-        {%endfor%}
+<div style="float:left;width:100%;">
+    <div class="panel panel-primary" style="float:left; width:30%;margin:10px;">
+        <div class="panel-heading">오늘 제작 시간 시간대별 추이<br>({{today}})</div>
+        <table class="table" style="">
+            <th>#</th>
+            <th>시간대</th>
+            <th>제작량</th>
+            {%for key, value in lists.items%}
+            <tr>
+                <td>{{forloop.counter}}. </td>
+                <td>{{key}}</td>
+                <td>{{value}}</td>
+            </tr>
+            {%endfor%}
+        </table>
     </div>
+</div>
 {%endblock content%}

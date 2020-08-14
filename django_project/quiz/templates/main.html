@@ -4,7 +4,7 @@
 {% block html %}
  <div id="side_right">
  <br>
-     전체 접속자 수 : {{ total_login}} <br> 어제 접속자 수 : {{ yesterday_login}} <br> 오늘 접속자 수 : {{today_login}}
+      전체 접속자 수 : {{ total_login}} , 어제 접속자 수 : {{ yesterday_login}} , 오늘 접속자 수 : {{today_login}}
     <br>
     <div style="float:left; width 50%;">
         <img src = "{%static '/images/graph/qaz.png'%}" alt="엥?">
@@ -12,11 +12,20 @@
     <br>
     <div style="float:left; width 50%;">
       <div class="most_cards">
-          인기 카드 1~5 <br>
-          {% for card in most_cards %}
-              {{ card.title }} : {{ card.likes}}
-          <br>
-          {% endfor %}
+          <table border="1">
+              <tr>
+                  <th>랭크</th>
+                  <th>카드</th>
+                  <th>좋아요</th>
+              </tr>
+              {% for card in most_cards %}
+              <tr>
+                  <td> {{ forloop.counter }} </td>
+                  <td> {{ card.title }} </td>
+                  <td> {{ card.likes }} </td>
+              </tr>
+              {% endfor %}
+          </table>
       </div>
     </div>
  </div>

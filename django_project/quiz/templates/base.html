@@ -1,33 +1,52 @@
 {% load static %}
+<style type ="text/css">
+div#side_left{
+width:200px;
+height:100%;
+background-color:rgb(204, 255, 255);
+float:left;
+}
+#side_rigth{
+width:200px;
+height:100%;
+float:left;
+margin:5px;
+}
+</style>
 <html>
-    <style type ="text/css">
-    div#side_left{
-    width:200px;
-    height:400px;
-    background-color:red;
-    float:left;
-    margin:5px;
-    }
-    #side_rigth{
-    width:200px;
-    height:400px;
-    float:left;
-    margin:5px;
-    }
-    </style>
     <head>
-      <title>Main </title>
+        <title>Main </title>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link rel="icon" href="/static/www/favicon.ico">
     </head>
     <body>
-     <div id="side_left">
-         <a href="http://127.0.0.1:8000/"> 메인 페이지 <br></a>
-         <a href="http://127.0.0.1:8000/cards"> 카드 목록 <br></a>
-         <a href="http://127.0.0.1:8000/visitors"> 시간대별 접속자 <br></a>
-         <a href="http://127.0.0.1:8000/search"> 인기 검색어 <br></a>
-         <a href="http://127.0.0.1:8000/download"> 인기 다운로드 <br></a>
-         <a href="http://127.0.0.1:8000/make"> 일별 제작 시간 추이 <br></a>
-     </div>
-        {% block html %}
-        {% endblock %}
+        <div id="side_left">
+            <ul class="nav nav-pills nav-stacked">
+            <img src = "{%static '/images/sogang.jpg'%}" width="180px" height="180px">
+                <li role="presentation" class="active"><a href="{%url 'main'%}"> 메인 페이지 </a></li>
+                <li role="presentation" class="active"><a href="{%url 'cards'%}"> 카드 목록 </a></li>
+                <li role="presentation" class="active"><a href="{%url 'visitors'%}"> 시간대별 접속자 </a></li>
+                <li role="presentation" class="active"><a href="{%url 'basic_search'%}"> 시간대별 검색 키워드 </a></li>
+                <li role="presentation" class="active"><a href="{%url 'basic_download'%}"> 시간대별 다운로드 키워드 </a></li>
+                <li role="presentation" class="active"><a href="{%url 'basic_make'%}"> 시간대별 제작 키워드 </a></li>
+            </ul>
+        <br>
+
+        <form action="{% url 'add_card_from_csv' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="csvFile"> csv 업로드 </label>
+                <input type="file" class="form_control" id="csv_file" name="csv_file">
+            </div>
+            <button tpye="submit" class="btn btn-info bnt-lg">
+                등록
+            </button>
+        </form>
+    </div>
+        <div style="float:left;width:80%;">
+            {% block html %}
+            {% endblock %}
+        </div>
     </body>
 </html>
