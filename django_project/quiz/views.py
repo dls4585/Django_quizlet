@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from scipy.sparse.data import _data_matrix
 from .models import Quiz, Card, Login, Search_time, Download_time, Make_time
 from json import dumps
@@ -687,6 +688,15 @@ def search_for_period(request):
     to_time = to_time + datetime.timedelta(days=1)
 
     contents = make_data(Search_time, from_time, to_time, 'keyword')
+    page = request.GET.get('page')
+    paginator = Paginator(list(contents.items()), 3)
+    #contents가 dict라서 tuple로 바꿔줌
+    try:
+        contents = paginator.page(page)
+    except PageNotAnInteger:
+        contents = paginator.page(1)
+    except EmptyPage:
+        contents = paginator.page(paginator.num_pages)
 
     context = {
         'form1': form1,
@@ -694,6 +704,7 @@ def search_for_period(request):
         'from': _from,
         'to': _to,
         'contents': contents,
+        'page': page,
     }
 
     return render(request, 'search/searched.html', context)
@@ -741,12 +752,22 @@ def search_for_selected_time(request):
             contents[i[0]] = i[1]
         contents_for_days[datetime.date.strftime(from_date, "%Y-%m-%d")] = contents
         from_date += datetime.timedelta(days=1)
+    page = request.GET.get('page')
+    paginator = Paginator(list(contents_for_days.items()), 3)
+    #contents가 dict라서 tuple로 바꿔줌
+    try:
+        contents_for_days = paginator.page(page)
+    except PageNotAnInteger:
+        contents_for_days = paginator.page(1)
+    except EmptyPage:
+        contents_for_days = paginator.page(paginator.num_pages)
     context = {
         'form1': form1,
         'form2': form2,
         'from': _from,
         'to': _to,
-        'contents' : contents_for_days,
+        'contents': contents_for_days,
+        'select': time,
     }
 
     return render(request, 'search/search_for_time.html', context)
@@ -795,7 +816,7 @@ def download_for_period(request):
     to_time = datetime.datetime.strptime(to_time, '%Y-%m-%d')
     to_time = datetime.date(to_time.year, to_time.month, to_time.day)
     to_time = to_time + datetime.timedelta(days=1)
-    list_for_days = {}
+    contents_for_days = {}
     while from_time < to_time:
         data = Download_time.objects.filter(time__contains=from_time).values('card_title', 'card')
         contents = {}
@@ -813,15 +834,23 @@ def download_for_period(request):
         download_list = {}
         for i in contents:
             download_list[i[0]] = i[1]
-        list_for_days[datetime.date.strftime(from_time, '%Y-%m-%d')] = download_list
+        contents_for_days[datetime.date.strftime(from_time, '%Y-%m-%d')] = download_list
         from_time += datetime.timedelta(days=1)
-
+    page = request.GET.get('page')
+    paginator = Paginator(list(contents_for_days.items()), 3)
+    # contents가 dict라서 tuple로 바꿔줌
+    try:
+        contents_for_days = paginator.page(page)
+    except PageNotAnInteger:
+        contents_for_days = paginator.page(1)
+    except EmptyPage:
+        contents_for_days = paginator.page(paginator.num_pages)
     context = {
         'form1': form1,
         'form2': form2,
         'from': _from,
         'to': _to,
-        'lists': list_for_days,
+        'contents': contents_for_days,
     }
 
     return render(request, 'download/download_searched.html', context)
@@ -844,7 +873,7 @@ def download_for_selected_time(request):
     from_time = time.split(' ~ ')[0]
     to_time = time.split(' ~ ')[1]
 
-    list_for_days = {}
+    contents_for_days = {}
     while from_date < to_date:
         contents = {}
         from_date_start = datetime.datetime(from_date.year, from_date.month, from_date.day, int(from_time), int('00'))
@@ -872,14 +901,24 @@ def download_for_selected_time(request):
         download_list = {}
         for i in contents:
             download_list[i[0]] = i[1]
-        list_for_days[datetime.date.strftime(from_date, '%Y-%m-%d')] = download_list
+        contents_for_days[datetime.date.strftime(from_date, '%Y-%m-%d')] = download_list
         from_date += datetime.timedelta(days=1)
+    page = request.GET.get('page')
+    paginator = Paginator(list(contents_for_days.items()), 3)
+    # contents가 dict라서 tuple로 바꿔줌
+    try:
+        contents_for_days = paginator.page(page)
+    except PageNotAnInteger:
+        contents_for_days = paginator.page(1)
+    except EmptyPage:
+        contents_for_days = paginator.page(paginator.num_pages)
     context = {
         'form1': form1,
         'form2': form2,
         'from': _from,
         'to': _to,
-        'lists': list_for_days,
+        'contents': contents_for_days,
+        'select': time,
     }
     return render(request, 'download/download_for_time.html', context)
 
@@ -939,9 +978,11 @@ def basic_make_view(request):
 def make_for_period(request):
     form = MakeSearchForm(request.GET)
     from_time = request.GET.get('_from')
+    _from = from_time
     from_time = datetime.datetime.strptime(from_time, '%Y-%m-%d')
     from_time = datetime.date(from_time.year, from_time.month, from_time.day)
     to_time = request.GET.get('_to')
+    _to = to_time
     to_time = datetime.datetime.strptime(to_time, '%Y-%m-%d')
     to_time = datetime.date(to_time.year, to_time.month, to_time.day)
     to_time = to_time + datetime.timedelta(days=1)
@@ -972,10 +1013,20 @@ def make_for_period(request):
         key_for_days = datetime.date.strftime(from_time, "%Y-%m-%d")
         count_for_days[key_for_days] = count_for_hours
         from_time += datetime.timedelta(days=1)
-
+    page = request.GET.get('page')
+    paginator = Paginator(list(count_for_days.items()), 3)
+    # contents가 dict라서 tuple로 바꿔줌
+    try:
+        count_for_days = paginator.page(page)
+    except PageNotAnInteger:
+        count_for_days = paginator.page(1)
+    except EmptyPage:
+        count_for_days = paginator.page(paginator.num_pages)
     context = {
         'form': form,
-        'counts': count_for_days,
+        'contents': count_for_days,
+        'from': _from,
+        'to': _to,
     }
 
     return render(request, 'make/make_searched.html', context)

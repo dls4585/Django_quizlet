@@ -1,11 +1,12 @@
 {%extends 'base.html'%}
 {%block html%}
-    <div>
+    <div style="width:100%;">
         <form id="set_period" name="set_period" method="get" action="{%url 'search'%}">
             <div class="panel panel-primary" style="float:left;margin-left:10px;width:50%;">
                 <div class="panel-heading">인기 검색어</div>
                 <div class="panel-body">
                     {{form1}}
+                    <input type="hidden" name="page" value="1">
                     <input type="submit" value="검색" style="width:10%;margin:7px;">
                 </div>
             </div>
