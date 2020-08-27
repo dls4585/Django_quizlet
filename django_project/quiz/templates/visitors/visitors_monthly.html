@@ -1,0 +1,74 @@
+{% extends 'visitors/visitors.html' %}
+{%load static%}
+{% block content %}
+    <div class="alert alert-info" role="alert" style="float:left;margin:10px">
+      입력한 시간대의 방문자 수만을 표시합니다.
+    <form action = "http://127.0.0.1:8000/visitors/{{ scale }}/detail" accept-charset="utf-8" name = "graph-option" method = "get">
+      <input type = 'hidden' name = 'scale' value= {{ scale }}>
+      <input type = 'hidden' name= 'from_month' value= {{ from_month }}>
+      <input type = 'hidden' name= 'to_month' value= {{ to_month }}>
+    <select name = "from_time">
+      <option value="none">=== from ===</option>
+      <option value = "01시" >01시</option>
+      <option value = "02시" >02시</option>
+      <option value = "03시" >03시</option>
+      <option value = "04시" >04시</option>
+      <option value = "05시" >05시</option>
+      <option value = "06시" >06시</option>
+      <option value = "07시" >07시</option>
+      <option value = "08시" >08시</option>
+      <option value = "09시" >09시</option>
+      <option value = "10시" >10시</option>
+      <option value = "11시" >11시</option>
+      <option value = "12시" >12시</option>
+      <option value = "13시" >13시</option>
+      <option value = "14시" >14시</option>
+      <option value = "15시" >15시</option>
+      <option value = "16시" >16시</option>
+      <option value = "17시" >17시</option>
+      <option value = "18시" >18시</option>
+      <option value = "19시" >19시</option>
+      <option value = "20시" >20시</option>
+      <option value = "21시" >21시</option>
+      <option value = "22시" >22시</option>
+      <option value = "23시" >23시</option>
+      <option value = "24시" >24시</option>
+    </select>
+    <select name = "to_time">
+      <option value="none">=== to ===</option>
+      <option value = "01시" >01시</option>
+      <option value = "02시" >02시</option>
+      <option value = "03시" >03시</option>
+      <option value = "04시" >04시</option>
+      <option value = "05시" >05시</option>
+      <option value = "06시" >06시</option>
+      <option value = "07시" >07시</option>
+      <option value = "08시" >08시</option>
+      <option value = "09시" >09시</option>
+      <option value = "10시" >10시</option>
+      <option value = "11시" >11시</option>
+      <option value = "12시" >12시</option>
+      <option value = "13시" >13시</option>
+      <option value = "14시" >14시</option>
+      <option value = "15시" >15시</option>
+      <option value = "16시" >16시</option>
+      <option value = "17시" >17시</option>
+      <option value = "18시" >18시</option>
+      <option value = "19시" >19시</option>
+      <option value = "20시" >20시</option>
+      <option value = "21시" >21시</option>
+      <option value = "22시" >22시</option>
+      <option value = "23시" >23시</option>
+      <option value = "24시" >24시</option>
+    </select>
+    <input type = "submit" value = "submit"/>
+    </form>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="panel panel-primary" style="float:left;margin:10px">
+      <div class="panel panel-heading">Graph</div>
+      <img src = "{% static '/images/graph/foo.png' %}"/>
+    </div>
+{% endblock %}

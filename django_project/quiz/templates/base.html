@@ -1,17 +1,29 @@
 {% load static %}
 <style type ="text/css">
 div#side_left{
-width:200px;
+width:15%;
 height:100%;
 background-color:rgb(204, 255, 255);
 float:left;
+margin_top:10px;
+margin_left:10px;
 }
-#side_rigth{
-width:200px;
-height:100%;
+#side_right{
+width:80%;
+height:15%;
 float:left;
-margin:5px;
+margin_top:10px;
 }
+#side_right2{
+width:80%;
+height:65%;
+float:left;
+margin_top:10px;
+}
+small {
+    font-size: .7em
+}
+
 </style>
 <html>
     <head>
@@ -21,32 +33,35 @@ margin:5px;
         <link rel="icon" href="/static/www/favicon.ico">
     </head>
     <body>
+        <div class="page-header" style="background-color:rgb(051, 152, 255); margin:0; height: 10%">
+            <div class="clearfix"></div>
+            <h1 align="left"><a href="{%url 'main'%}"><img src ="{%static '/images/sogang1.png'%}" width="50px" height="50px" style="margin-right:10px;">Administrator</a></h1>
+        </div>
         <div id="side_left">
             <ul class="nav nav-pills nav-stacked">
-            <img src = "{%static '/images/sogang.jpg'%}" width="180px" height="180px">
-                <li role="presentation" class="active"><a href="{%url 'main'%}"> 메인 페이지 </a></li>
-                <li role="presentation" class="active"><a href="{%url 'cards'%}"> 카드 목록 </a></li>
-                <li role="presentation" class="active"><a href="{%url 'visitors'%}"> 시간대별 접속자 </a></li>
-                <li role="presentation" class="active"><a href="{%url 'basic_search'%}"> 시간대별 검색 키워드 </a></li>
-                <li role="presentation" class="active"><a href="{%url 'basic_download'%}"> 시간대별 다운로드 키워드 </a></li>
-                <li role="presentation" class="active"><a href="{%url 'basic_make'%}"> 시간대별 제작 키워드 </a></li>
+                <li role="presentation"><a href="{%url 'main'%}"> 메인 페이지 </a></li>
+                <li role="presentation"><a href="{%url 'cards'%}"> 카드 검색 </a></li>
+                <li role="presentation"><a href="{%url 'visitors'%}"> 접속자 수 </a></li>
+                <li role="presentation"><a href="{%url 'basic_search'%}"> 인기 검색어 </a></li>
+                <li role="presentation"><a href="{%url 'basic_download'%}"> 인기 다운로드 </a></li>
+                <li role="presentation"><a href="{%url 'basic_make'%}"> 카드 제작량 </a></li>
             </ul>
-        <br>
-
-        <form action="{% url 'add_card_from_csv' %}" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="csvFile"> csv 업로드 </label>
-                <input type="file" class="form_control" id="csv_file" name="csv_file">
+            <div style="margin-left:15px;">
+            <form action="{% url 'add_card_from_csv' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="csvFile"> csv 업로드 </label>
+                    <input type="file" class="form_control" id="csv_file" name="csv_file">
+                </div>
             </div>
-            <button tpye="submit" class="btn btn-info bnt-lg">
-                등록
-            </button>
-        </form>
-    </div>
-        <div style="float:left;width:80%;">
-            {% block html %}
-            {% endblock %}
+                <div style="margin-left:15px;">
+                    <button type="submit" class="btn btn-info bnt-lg">
+                        등록
+                    </button>
+                </div>
+            </form>
         </div>
+        {% block html %}
+        {% endblock %}
     </body>
 </html>

@@ -12,4 +12,4 @@ gensim
 konlpy
 pandas
 matplotlib
-
+seaborn

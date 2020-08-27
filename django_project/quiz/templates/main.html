@@ -2,31 +2,64 @@
 {% load static %}
 
 {% block html %}
- <div id="side_right">
- <br>
-      전체 접속자 수 : {{ total_login}} , 어제 접속자 수 : {{ yesterday_login}} , 오늘 접속자 수 : {{today_login}}
-    <br>
-    <div style="float:left; width 50%;">
+<div id="side_right">
+    <div style="float:left; margin-left:40px; margin-top:10px;">
+        <table class="table table-striped" style="text-align: center;">
+            <tr>
+                <th style="font-size:3em;"><center>{{total_login}}</center></th>
+            </tr>
+            <tr>
+                <th style="font-size:0.7em;">총 접속자 수</th>
+            </tr>
+        </table>
+    </div>
+    <div style="float:left; margin-left:20px; margin-top:10px;">
+        <table class="table table-striped" >
+            <tr>
+                <th style="font-size:3em;"><center>{{yesterday_login}}</center></th>
+            </tr>
+            <tr>
+                <th style="font-size:0.7em;">어제 접속자 수</th>
+            </tr>
+        </table>
+    </div>
+    <div style="float:left; margin-left:20px; margin-top:10px;">
+        <table class="table table-striped" style="text-align: center;">
+            <tr>
+                <th style="font-size:3em;"> <center>{{today_login}}</center></th>
+            </tr>
+            <tr>
+                <th style="font-size:0.7em;">오늘 접속자 수</th>
+            </tr>
+        </table>
+    </div>
+</div>
+<div id="side_right2">
+    <div style="float:left; margin-left:10px; margin-top:10px; padding-left:10px;">
         <img src = "{%static '/images/graph/qaz.png'%}" alt="엥?">
     </div>
     <br>
-    <div style="float:left; width 50%;">
-      <div class="most_cards">
-          <table border="1">
-              <tr>
-                  <th>랭크</th>
-                  <th>카드</th>
-                  <th>좋아요</th>
-              </tr>
-              {% for card in most_cards %}
-              <tr>
-                  <td> {{ forloop.counter }} </td>
-                  <td> {{ card.title }} </td>
-                  <td> {{ card.likes }} </td>
-              </tr>
-              {% endfor %}
-          </table>
-      </div>
+    <div style="font-size:1em; float:left; margin-left:10px; margin-top:10px;">
+        <br><br>
+        <div class="most_cards">
+            <div class="panel panel-default">
+                <div class="panel-heading"> 좋아요 표 </div>
+                <table class="table table-striped" style="font-size:1em; margin-left:auto; margin-right:auto;">
+                    <tr>
+                        <th>랭크</th>
+                        <th>카드</th>
+                        <th>좋아요</th>
+                    </tr>
+                    {% for card in most_cards %}
+                    <tr>
+                        <td> {{ forloop.counter }} </td>
+                        <td> {{ card.title }} </td>
+                        <td> {{ card.likes }} </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
     </div>
  </div>
 {% endblock %}

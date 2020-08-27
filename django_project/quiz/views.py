@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from scipy.sparse.data import _data_matrix
+# from scipy.sparse.data import _data_matrix
 from .models import Quiz, Card, Login, Search_time, Download_time, Make_time
 from json import dumps
 from django.utils import timezone
@@ -23,6 +23,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import csv
 from django.contrib import messages
+import seaborn as sns
 
 def get_card(request, pk):
     try:
@@ -244,7 +245,7 @@ def show_default_graph(request):
     df, title = make_hourly_df_and_title(today_str)
     title = "Today : " + today_str
     draw_graph(df, title)
-    return render(request, 'quiz/visitors.html')
+    return render(request, 'visitors/visitors.html')
 
 
 @login_required
@@ -256,28 +257,28 @@ def show_num_of_visitors(request):
         df, title = make_hourly_df_and_title(target_date)
         draw_graph(df, title)
         context = {'scale': scale, 'date': target_date}
-        return render(request, 'quiz/visitors_hourly.html', context)
+        return render(request, 'visitors/visitors_hourly.html', context)
     elif scale == 'daily':
         from_date = request.GET.get('from')
         to_date = request.GET.get('to')
         df, title = make_daily_df_and_title(from_date, to_date)
         draw_graph(df, title)
         context = {'scale': scale, 'from_date': from_date, 'to_date': to_date}
-        return render(request, 'quiz/visitors_daily.html', context)
+        return render(request, 'visitors/visitors_daily.html', context)
     elif scale == 'weekly':
         from_date = request.GET.get('from')
         to_date = request.GET.get('to')
         df, title = make_weekly_df_and_title(from_date, to_date)
         draw_graph(df, title)
         context = {'scale': scale, 'from_date': from_date, 'to_date': to_date}
-        return render(request, 'quiz/visitors_weekly.html', context)
+        return render(request, 'visitors/visitors_weekly.html', context)
     elif scale == 'monthly':
         from_month = request.GET.get('from')
         to_month = request.GET.get('to')
         df, title = make_monthly_df_and_title(from_month, to_month)
         draw_graph(df, title)
         context = {'scale': scale, 'from_month': from_month, 'to_month': to_month}
-        return render(request, 'quiz/visitors_monthly.html', context)
+        return render(request, 'visitors/visitors_monthly.html', context)
 
 
 def make_hourly_df_and_title(date):
@@ -402,14 +403,21 @@ def make_monthly_df_and_title(from_month, to_month):
 
 
 def draw_graph(dataframe, title):
-    plt.figure(figsize=(11, 5))
-    plt.title(title)
+    sns.set(style="darkgrid")
+    f, ax = plt.subplots(1, 1, figsize=(10, 4))
+
+    ax.set_title(title, fontsize=20, loc='left', pad=20) # 타이틀 위치
+    ax.spines['bottom'].set_visible(False)  # 축의 선 없앰
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['right'].set_visible(False)
     plt.yticks(np.arange(0, max(dataframe.values)+1, 1))
-    plt.stem(dataframe.index, dataframe.values)
+
+    plt.stem(dataframe.index, dataframe.values, basefmt='.', linefmt='-')
     base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                             'quiz/static')
     file_path = os.path.join(base_dir, 'images/graph/foo.png').replace("\\", "/", 30)
-    plt.savefig(file_path)
+    plt.savefig(file_path, bbox_inches='tight')
 
 
 @login_required
@@ -423,7 +431,7 @@ def show_visitors_detail(request):
         df, title = show_daily_detail(from_date, to_date, from_time, to_time)
         draw_graph(df, title)
         context = {'scale': scale, 'from_date': from_date, 'to_date': to_date}
-        return render(request, 'quiz/visitors_daily.html', context)
+        return render(request, 'visitors/visitors_daily.html', context)
     elif scale == 'weekly':
         from_date = request.GET.get('from_date')
         to_date = request.GET.get('to_date')
@@ -432,7 +440,7 @@ def show_visitors_detail(request):
         df, title = show_weekly_detail(from_date, to_date, from_time, to_time)
         draw_graph(df, title)
         context = {'scale': scale, 'from_date': from_date, 'to_date': to_date}
-        return render(request, 'quiz/visitors_weekly.html', context)
+        return render(request, 'visitors/visitors_weekly.html', context)
     elif scale == 'monthly':
         from_month = request.GET.get('from_month')
         to_month = request.GET.get('to_month')
@@ -441,7 +449,7 @@ def show_visitors_detail(request):
         df, title = show_monthly_detail(from_month, to_month, from_time, to_time)
         draw_graph(df, title)
         context = {'scale': scale, 'from_month': from_month, 'to_month': to_month}
-        return render(request, 'quiz/visitors_monthly.html', context)
+        return render(request, 'visitors/visitors_monthly.html', context)
 
 
 def show_daily_detail(from_date, to_date, from_time, to_time):
@@ -557,14 +565,14 @@ def show_monthly_detail(from_month, to_month, from_time, to_time):
 
 @login_required
 def show_card_list(request):
-    card_list = Card.objects.all()
+    card_list = None
     context = {'cards': card_list}
-    return render(request, 'quiz/cards.html', context)
+    return render(request, 'search_admin/cards.html', context)
 
 @login_required
 def show_card_list_searched(request):
     card_name = request.GET.get('keyword')
-    save_kw_time(card_name)
+    # save_kw_time(card_name)
     correspond = Card.objects.filter(title=card_name).order_by('-likes')
     contained = Card.objects.filter(title__icontains=card_name).exclude(title=card_name).order_by('-likes')
     description_search = Card.objects.filter(description__icontains=card_name) \
@@ -619,8 +627,13 @@ def show_card_list_searched(request):
     try:
         rtn = find_similar(card_name, sentence, skip_gram=True)
     except:
-        context = {'cards': result}
-        return render(request, 'quiz/cards.html', context)
+        card_list = result
+        paginator = Paginator(card_list, 5)
+        page = request.GET.get('page')
+        keyword = request.GET.get('keyword')
+        cards = paginator.get_page(page)
+        context = {'cards': cards, 'keyword': keyword}
+        return render(request, 'search_admin/cards.html', context)
 
     for i in rtn:
         a = Card.objects.filter(title__icontains=i).exclude(title__icontains=card_name).order_by('-likes').values()
@@ -630,8 +643,13 @@ def show_card_list_searched(request):
             else:
                 result.append(j)
 
-    context = {'cards': result}
-    return render(request, 'quiz/cards.html', context)
+    card_list = result
+    paginator = Paginator(card_list, 5)
+    keyword = request.GET.get('keyword')
+    page = request.GET.get('page')
+    cards = paginator.get_page(page)
+    context = {'cards': cards, 'keyword': keyword}
+    return render(request, 'search_admin/cards.html', context)
 
 
 @login_required
@@ -640,11 +658,11 @@ def retrive_card(request):
     target_card = Card.objects.filter(pk=pk)[0]
     quizzes_of_target_card = target_card.quiz_set.all()
     if quizzes_of_target_card:
-        context = {'quizzes': quizzes_of_target_card}
-        return render(request, 'quiz/card_retrieved.html', context)
+        context = {'card':target_card, 'quizzes': quizzes_of_target_card}
+        return render(request, 'search_admin/card_retrieved.html', context)
     else:
         context = {'card': target_card}
-        return render(request, 'quiz/card_none.html', context)
+        return render(request, 'search_admin/card_none.html', context)
 
 
 
