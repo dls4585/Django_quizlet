@@ -7,5 +7,3 @@ admin.site.register(Search_time)
 admin.site.register(Download_time)
 admin.site.register(Make_time)
 admin.site.register(Login)
-
-

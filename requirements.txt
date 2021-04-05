@@ -13,3 +13,4 @@ konlpy
 pandas
 matplotlib
 seaborn
+
