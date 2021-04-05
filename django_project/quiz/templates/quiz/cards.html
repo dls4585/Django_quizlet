@@ -1,0 +1,24 @@
+{%extends 'base.html'%}
+{%block html%}
+<form method="get" action="http://127.0.0.1:8000/cards/results">
+<input type="text" name="keyword" placeholder="Card 검색">
+​​​​​​​ <button type="submit">SEARCH</button>
+</form> <br>
+
+    <table border="1" width ="800">
+	<th>사용자</th>
+	<th>제목</th>
+    <th>해시태그</th>
+    <th>설명</th>
+    <th>좋아요</th>
+    {% for card in cards %}
+	<tr><!-- 첫번째 줄 시작 -->
+	    <td align="center">{{ card.user_name }}</td>
+	    <td align="center"><a href = "http://127.0.0.1:8000/cards/results/retrieve/?pk={{ card.pk }}">{{ card.title }}</a></td>
+        <td>{{ card.hashtag }}</td>
+        <td>{{ card.description}}</td>
+        <td align="center">{{ card.likes }}</td>
+	</tr>
+    {% endfor %}
+    </table>
+{%endblock html%}

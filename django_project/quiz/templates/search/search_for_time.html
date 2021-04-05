@@ -1,0 +1,54 @@
+{%extends 'search/search.html'%}
+{%block content%}
+<div style="float:left; width:80%">
+    <div class="panel panel-default" style="float:left;height:10%; width:30%;margin-left:10px;margin-top:3px;">
+        <div class="panel-body">
+            <form id="set_period" name="set_period" method="get" action="{%url 'search_time'%}">
+                {{form2}}
+                <input type="hidden" value="{{from}}" name="_from">
+                <input type="hidden" value="{{to}}" name="_to">
+                <input type="submit" value="검색" style="width:50px;">
+            </form>
+        </div>
+    </div>
+</div>
+<div style="float:left; width:80%;">
+    {%for date, values in contents%}
+    <div class="panel panel-primary" style="float:left;width:30%;margin:10px;">
+        <div class="panel panel-heading">{{date}}</div>
+        <table class="table" style="">
+            <th>#</th>
+            <th>검색어</th>
+            <th>검색량</th>
+            {%for key, value in values.items%}
+            <tr>
+                {% if forloop.counter < 11 %}
+                <td>{{forloop.counter}}.</td>
+                <td><a href="http://127.0.0.1:8000/cards/results/?keyword={{key}}"> {{key}} </a></td>
+                <td>{{value}}</td>
+                {%endif%}
+            </tr>
+            {%endfor%}
+        </table>
+    </div>
+    {%endfor%}
+</div>
+
+<nav>
+    <ul class="pager" style="float:left;margin-left:40%;margin-right:40%;">
+        {%if contents.has_previous %}
+        <li><a href="?select={{select}}&_from={{from}}&_to={{to}}&page={{contents.previous_page_number}}">Previous</a></li>
+        {%else%}
+        <li class="disabled"><a href="#">Previous</a></li>
+        {%endif%}
+        <span>{{contents.number}}</span>
+        <span>/</span>
+        <span>{{contents.paginator.num_pages}}</span>
+        {%if contents.has_next%}
+        <li><a href="?select={{select}}&_from={{from}}&_to={{to}}&page={{contents.next_page_number}}">Next</a></li>
+       {%else%}
+        <li class="disabled"><a href="#">Next</a></li>
+        {%endif%}
+    </ul>
+</nav>
+{%endblock%}

@@ -1,0 +1,39 @@
+{%extends 'make/make.html'%}
+{%block content%}
+<div style="float:left;width:80%;">
+    {%for date, values in contents%}
+    <div class="panel panel-primary" style="float:left;width:30%;margin:10px;">
+        <div class="panel panel-heading">{{date}}</div>
+        <table class="table" style="">
+            <th>#</th>
+            <th>시간대</th>
+            <th>제작량</th>
+            {%for key, value in values.items%}
+            <tr>
+                <td>{{forloop.counter}}. </td>
+                <td>{{key}}</td>
+                <td>{{value}}</td>
+            </tr>
+            {%endfor%}
+        </table>
+    </div>
+    {%endfor%}
+</div>
+<nav>
+    <ul class="pager" style="float:left;margin-left:40%;margin-right:40%;">
+        {%if contents.has_previous %}
+        <li><a href="?_from={{from}}&_to={{to}}&page={{contents.previous_page_number}}">Previous</a></li>
+        {%else%}
+        <li class="disabled"><a href="#">Previous</a></li>
+        {%endif%}
+        <span>{{contents.number}}</span>
+        <span>/</span>
+        <span>{{contents.paginator.num_pages}}</span>
+        {%if contents.has_next%}
+         <li><a href="?_from={{from}}&_to={{to}}&page={{contents.next_page_number}}">Next</a></li>
+       {%else%}
+        <li class="disabled"><a href="#">Next</a></li>
+        {%endif%}
+    </ul>
+</nav>
+{%endblock content%}

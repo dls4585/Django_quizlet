@@ -1,0 +1,17 @@
+{%extends 'base.html'%}
+{%block html%}
+
+<div class="panel panel-primary" style="float:left;margin:10px;">
+    <div class="panel panel-heading">"{{ card.user_name }} - {{ card.title }}"의 하위 퀴즈 목록</div>
+	<table class="table" style="width:800">
+		<th>퀴즈</th>
+		<th>답</th>
+		{% for quiz in quizzes %}
+		<tr><!-- 첫번째 줄 시작 -->
+			<td>{{ quiz.question }}</td>
+			<td>{{ quiz.answer }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+{%endblock html%}

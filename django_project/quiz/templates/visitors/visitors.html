@@ -1,0 +1,121 @@
+{%extends 'base.html'%}
+{%load static%}
+{%block html%}
+<html>
+    {%load static%}
+<head></head>
+<body>
+
+<script type="text/javascript">
+function innertHtmlSelect(val){
+    var html_hourly =
+    "<div class=\"panel panel-default\" style=\"float:left;margin:10px\">" +
+        "<div class=\"clearfix\"></div>" +
+        "<form action = \"http://127.0.0.1:8000/visitors/hourly\" accept-charset=\"utf-8\" name = \"graph-option\" method = \"get\">"+
+            "<input type = \'hidden\' name=\'scale\' value=\'hourly\'>"+
+            "<div class=\"panel-body\">"+
+                "날짜 : <input type = \'date\' name=\'date\' value=\'\' required/>&nbsp;&nbsp;"+
+                "<input type = \"submit\" value = \"submit\"/>"+
+            "</div>"+
+        "</form>"+
+    "</div>"+
+    "<div class=\"clearfix\"></div>"+
+    "<div class=\"panel panel-primary\" style=\"float:left;margin:10px\">"+
+        "<div class=\"panel panel-heading\">Graph</div>"+
+        "<img src = \"{% static '/images/graph/foo.png' %}\"/>"+
+    "</div>";
+
+	var html_daily =
+	"<div class=\"panel panel-default\" style=\"float:left;margin:10px\">"+
+	    "<div class=\"clearfix\"></div>"+
+	    "<form action = \"http://127.0.0.1:8000/visitors/daily\" accept-charset=\"utf-8\" name = \"graph-option\" method = \"get\">"+
+	        "<input type = \'hidden\' name=\'scale\' value=\'daily\'/ >"+
+	        "<div class=\"panel-body\">"+
+	            "from : <input type = \'date\' name=\'from\' value=\'\' required/> &nbsp;&nbsp;"+
+	            "to : <input type = \'date\' name=\'to\' value=\'\' required/> &nbsp;&nbsp;"+
+	            "<input type = \"submit\" value = \"submit\"/>"+
+	        "</div>"+
+	    "</form>"+
+	"</div>"+
+    "<div class=\"clearfix\"></div>"+
+    "<div class=\"panel panel-primary\" style=\"float:left;margin:10px\">"+
+        "<div class=\"panel panel-heading\">Graph</div>"+
+        "<img src = \"{% static '/images/graph/foo.png' %}\"/>"+
+    "</div>";
+
+	var html_weekly =
+    "<div class=\"panel panel-default\" style=\"float:left;margin:10px\">"+
+        "<div class=\"clearfix\"></div>"+
+        "<form action = \"http://127.0.0.1:8000/visitors/weekly\" accept-charset=\"utf-8\" name = \"graph-option\" method = \"get\">"+
+            "<input type = \'hidden\' name=\'scale\' value=\'weekly\'/>"+
+            "<div class=\"panel-body\">"+
+                "from : <input type = \'date\' name=\'from\' value=\'\' required/> &nbsp;&nbsp;"+
+                "to : <input type = \'date\' name=\'to\' value=\'\' required/> &nbsp;&nbsp;"+
+                "<input type = \"submit\" value = \"submit\"/>"+
+            "</div>"+
+        "</form>"+
+    "</div>"+
+    "<div class=\"clearfix\"></div>"+
+    "<div class=\"panel panel-primary\" style=\"float:left;margin:10px\">"+
+        "<div class=\"panel panel-heading\">Graph</div>"+
+        "<img src = \"{% static '/images/graph/foo.png' %}\"/>"+
+    "</div>";
+
+    var html_monthly =
+    "<div class=\"panel panel-default\" style=\"float:left;margin:10px\">"+
+        "<div class=\"clearfix\"></div>"+
+            "<form action = \"http://127.0.0.1:8000/visitors/monthly\" accept-charset=\"utf-8\" name = \"graph-option\" method = \"get\">"+
+                "<input type = \'hidden\' name=\'scale\' value=\'monthly\'/ >"+
+                "<div class=\"panel-body\">"+
+                    "from : <input placeholder = \"YYYY-MM\" type=\'text\' name=\'from\' value=\'\' required/> &nbsp;&nbsp; "+
+                    "to : <input placeholder = \"YYYY-MM\" type=\'text\' name=\'to\' value=\'\' required/> &nbsp;&nbsp;"+
+                    "<input type = \"submit\" value = \"submit\"/>"+
+                "</div>"+
+            "</form>"+
+    "</div>"+
+    "<div class=\"clearfix\"></div>"+
+    "<div class=\"panel panel-primary\" style=\"float:left;margin:10px\">"+
+        "<div class=\"panel panel-heading\">Graph</div>"+
+        "<img src = \"{% static '/images/graph/foo.png' %}\"/>"+
+    "</div>";
+
+    if (val == "hourly"){
+        html = html_hourly;
+    }else if (val =="daily"){
+		html = html_daily;
+	} else if (val =="weekly"){
+		html = html_weekly;
+	} else if (val =="monthly"){
+		html = html_monthly;
+	}
+	document.getElementById('div_html').innerHTML = html;
+}
+</script>
+
+<div class="panel panel-primary" style="float:left;margin:10px;width:150">
+        <div class="panel panel-heading" style="" >접속자 수</div>
+            <div class="panel panel-default" style="float:left;margin:10px"></div>
+                <select id="scale" name="scale" onChange="innertHtmlSelect(this.value);" >
+                    <option value ="none"> ==단위선택== </option>
+                    <option value ="hourly"> 시간대별 </option>
+                    <option value ="daily"> 일간 </option>
+                    <option value ="weekly"> 주간 </option>
+                    <option value ="monthly"> 월간 </option>
+                </select>
+                <br><br>
+</div>
+
+<div class="clearfix"></div>
+
+<div id="div_html">
+    {% block content %}
+        <div class="panel panel-primary" style="float:left;margin:10px">
+            <div class="panel panel-heading">Graph</div>
+            <img src = "{% static '/images/graph/foo.png' %}"/>
+        </div>
+    {% endblock %}
+</div>
+
+</body>
+</html>
+{%endblock html%}

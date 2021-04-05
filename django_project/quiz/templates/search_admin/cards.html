@@ -1,0 +1,67 @@
+{%extends 'base.html'%}
+{%block html%}
+
+<div class="panel panel-primary" style="float:left;margin:10px;width:800">
+    <div class="panel panel-heading" style="" >카드 검색</div>
+        <form method="get" action="http://127.0.0.1:8000/cards/results">
+            <div class="panel panel-default" style="float:left;margin:10px"></div>
+                <input type="text" name="keyword" placeholder="검색어를 입력하세요." style="width:300">&nbsp;&nbsp;
+                <input type="hidden" name="page" value="1">
+                <button type="submit">SEARCH</button>
+        </form> <br>
+</div>
+
+<div class="clearfix"></div>
+
+<div class="panel panel-primary" style="float:left;margin:10px;">
+    <div class="panel panel-heading">카드 목록</div>
+        <table class="table" style="width:800">
+            <th class="text-center" style="width:70px">사용자</th>
+            <th class="text-center" style="width:100px">제목</th>
+            <th class="text-center" style="width:200px">해시태그</th>
+            <th class="text-center" >설명</th>
+            <th class="text-center" >좋아요</th>
+
+            {% for card in cards %}
+            <tr><!-- 첫번째 줄 시작 -->
+                <td align="center">{{ card.user_name }}</td>
+                <td align="center"><a href = "http://127.0.0.1:8000/cards/results/retrieve/?pk={{ card.pk }}">{{ card.title }}</a></td>
+                <td>{{ card.hashtag }}</td>
+                <td>{{ card.description}}</td>
+                <td align="center">{{ card.likes }}</td>
+            </tr>
+            {% endfor %}
+            </table>
+
+    <div align="center">
+        <nav>
+            <ul class="pagination">
+                {% if cards.has_previous %}
+                <li class="page-item"><a href="?keyword={{keyword}}&page={{cards.previous_page_number}}" class="page-link"
+                    aria-label="Previous"> <span>«</span>
+                </a></li>
+                {% endif %}
+
+                {% for i in cards.paginator.page_range %}
+                {% if cards.number == i %}
+                  <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                  <li><a href="?keyword={{keyword}}&page={{ i }}">{{ i }}</a></li>
+                    <input type="hidden" name="keyword" value="{{keyword}}">
+                {% endif %}
+                {% endfor %}
+
+                {% if cards.has_next %}
+                <li class="page-item"><a href="?keyword={{keyword}}&page={{cards.next_page_number}}" class="page-link"
+                    aria-label="Previous"> <span>»</span>
+                </a></li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    </div>
+</div>
+
+{%endblock html%}
+
+

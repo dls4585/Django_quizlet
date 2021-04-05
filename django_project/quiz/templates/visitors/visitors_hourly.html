@@ -1,0 +1,8 @@
+{% extends 'visitors/visitors.html' %}
+{%load static%}
+{% block content %}
+    <div class="panel panel-primary" style="float:left;margin:10px">
+        <div class="panel panel-heading">Graph</div>
+        <img src = "{% static '/images/graph/foo.png' %}"/>
+    </div>
+{% endblock %}

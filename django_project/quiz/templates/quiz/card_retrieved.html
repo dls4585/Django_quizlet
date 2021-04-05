@@ -1,0 +1,14 @@
+{%extends 'base.html'%}
+{%block html%}
+ <br>
+	<table border="1" width ="800">
+	<th>퀴즈</th>
+	<th>답</th>
+	{% for quiz in quizzes %}
+	<tr><!-- 첫번째 줄 시작 -->
+		<td>{{ quiz.question }}</td>
+		<td align="center">{{ quiz.answer }}</td>
+	</tr>
+	{% endfor %}
+	</table>
+{%endblock html%}
