@@ -1,11 +1,11 @@
 {%extends 'base.html'%}
 {%block html%}
 
-<div class="panel panel-primary" style="float:left;margin:10px;width:800">
+<div class="panel panel-primary" style="float:left;margin:10px;width:800px">
     <div class="panel panel-heading" style="" >카드 검색</div>
         <form method="get" action="http://127.0.0.1:8000/cards/results">
             <div class="panel panel-default" style="float:left;margin:10px"></div>
-                <input type="text" name="keyword" placeholder="검색어를 입력하세요." style="width:300">&nbsp;&nbsp;
+                <input type="text" name="keyword" placeholder="검색어를 입력하세요." style="width:300px">&nbsp;&nbsp;
                 <input type="hidden" name="page" value="1">
                 <button type="submit">SEARCH</button>
         </form> <br>
@@ -15,7 +15,7 @@
 
 <div class="panel panel-primary" style="float:left;margin:10px;">
     <div class="panel panel-heading">카드 목록</div>
-        <table class="table" style="width:800">
+        <table class="table" style="width:800px">
             <th class="text-center" style="width:70px">사용자</th>
             <th class="text-center" style="width:100px">제목</th>
             <th class="text-center" style="width:200px">해시태그</th>
