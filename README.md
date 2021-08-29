@@ -6,7 +6,7 @@
 
 ## IA
 
-![IA_Diagram](./imgs_for_document/IA_Diagram.jpg)
+![IA_Diagram](./docs/imgs_for_document/IA_Diagram.jpg)
 
 
 
@@ -26,7 +26,7 @@
   $ cd quizlet
   $ python -m venv myvenv
   ```
-  
+
 - Run virtual environment
 
   ```shell
@@ -63,11 +63,11 @@
 
 ## Draft imgs
 
-![IA_Diagram](./imgs_for_document/create_card.jpg)
+![IA_Diagram](./docs/imgs_for_document/create_card.jpg)
 
-![IA_Diagram](./imgs_for_document/quiz_view1.jpg)
+![IA_Diagram](./docs/imgs_for_document/quiz_view1.jpg)
 
-![IA_Diagram](./imgs_for_document/quiz_view2.jpg)
+![IA_Diagram](./docs/imgs_for_document/quiz_view2.jpg)
 
 
 
