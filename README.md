@@ -1,8 +1,8 @@
-# Voice Quiz Let APP Service
+# Quiz Let APP Service
 
 ## Description
 
-- 음성 지원을 통한 암기 학습 도움 앱 서비스
+- 카드를 이용한 암기 학습 도움 앱 서비스
 
 ## IA
 
